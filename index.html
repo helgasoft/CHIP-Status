@@ -1,13 +1,14 @@
 <!--
     Autor: Mario Pérez Esteso <mario@geekytheory.com>
     Web: geekytheory.com
+    Updated for CHIP
 -->
 <html class="no-js" lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>
-		Raspberry Pi Status
+		CHIP Status
 	</title>
     <!-- Importo el módulo socket.io que tengo en el proyecto -->
     <script src="/socket.io/socket.io.js"></script>
@@ -27,14 +28,13 @@
 
 </head>
 <body>
-<!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="container">
+  <div class="container">
           
   <div class="row marketing">
       <div class="col-lg-4">
         <div class="panel panel-primary">
           <div class="panel-heading">General info</div>
-          <div class="panel-body"><p  id="p_hostname">Here you can see the general info of the Raspberry Pi</p>
+          <div class="panel-body"><p  id="p_hostname">Here is general info for the CHIP</p>
             <p  id="p_kernel"></p>
             <p  id="p_uptime"></p>
             <div>
@@ -45,7 +45,7 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-8">
+      <div class="col-lg-8"><p />
         <div id="chartMemory" style="min-width: 100; height:250px; margin: 0 auto"></div>
       </div>
   </div>
@@ -63,7 +63,7 @@
 
     <!-- Comienza el Javascript -->
     <script>
-    // Creo un WebSocket. ¡Poned la IP de vuestra Raspberry Pi! 
+    // Creo un WebSocket. ¡Poned la IP de vuestra CHIP! 
     var socket = io.connect('http://'+ location.host);
     // console.log(location.host)
     // Creo un nuevo objeto 'Chart'
@@ -86,7 +86,7 @@
             selected : 100
         },
         title: {
-            text: 'CPU Temperature Raspberry Pi'
+            text: 'CHIP Temperature of PMU (axp209)'
         },
         xAxis: {
             type: 'datetime',
@@ -128,7 +128,7 @@
             selected : 100
         },
         title: {
-            text: 'CPU Load Raspberry Pi'
+            text: 'CPU Load CHIP'
         },
         xAxis: {
             type: 'datetime',
@@ -203,13 +203,13 @@
             }]
         });
         socket.on('hostname', function (hname) {
-          document.getElementById("p_hostname").innerHTML="<b>Hostname:</b> "+hname;
+          document.getElementById("p_hostname").innerHTML="<b>Hostname:</b> " + hname;
         });
         socket.on('kernel', function (ker) {
-          document.getElementById("p_kernel").innerHTML="<b>Kernel:</b> "+ker;
+          document.getElementById("p_kernel").innerHTML="<b>Kernel:</b> " + ker;
         }); 
         socket.on('uptime', function (uptime) {
-          document.getElementById("p_uptime").innerHTML="<b>Up time:</b> "+ uptime;
+          document.getElementById("p_uptime").innerHTML="<b>Up time:</b> " + uptime;
         }); 
         socket.on('toplist', function (toplist) {
             var res = toplist.split("\n");
