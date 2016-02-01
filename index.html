@@ -33,7 +33,7 @@
   <div class="row marketing">
       <div class="col-lg-4">
         <div class="panel panel-primary">
-          <div class="panel-heading">General info</div>
+          <div class="panel-heading">General Info</div>
           <div class="panel-body"><p  id="p_hostname">Here is general info for the CHIP</p>
             <p  id="p_kernel"></p>
             <p  id="p_uptime"></p>
@@ -165,9 +165,9 @@
                     }
                   }
             },
-            title: {
-                text: 'Memory'
-            },
+            //title: {
+            //    text: 'Memory'
+            //},
             xAxis: {
                 categories: ['Used', 'Free', 'Buffered', 'Cached'],
                 title: {
@@ -209,7 +209,7 @@
           document.getElementById("p_kernel").innerHTML="<b>Kernel:</b> " + ker;
         }); 
         socket.on('uptime', function (uptime) {
-          document.getElementById("p_uptime").innerHTML="<b>Up time:</b> " + uptime;
+          document.getElementById("p_uptime").innerHTML="<b>Up time</b> (hh:mm): " + uptime;
         }); 
         socket.on('toplist', function (toplist) {
             var res = toplist.split("\n");

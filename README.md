@@ -1,9 +1,8 @@
-Raspberry Pi Monitoring Panel
-===================
+CHIP Monitoring Panel
+=====================
 
-This project consist on a Node.js-based Raspberry Pi monitoring panel that allows to check the temperature, memory status (free, cached, buffered, total...), the CPU load and the top tasks with their PID. 
-
-This is a very useful web app for checking the status not only of a Raspberry Pi but also of a Linux computer.
+CHIP monitoring panel based on Node.js to check temperature, memory status (free, cached, buffered, total), CPU load and top tasks. 
+Adapted for the [CHIP](http://getchip.com/pages/chip "CHIP") from the original Raspberry Pi source code.
 
 # Author
 
@@ -12,46 +11,35 @@ This project has been developed by [Mario Pérez Esteso](http://github.com/mario
 #### Contributors
 
 * [Bernat Borrás Paronella](http://github.com/alorma "Bernat Borrás Paronella")
+* [Helgasoft](http://www.helgasoft.com "Helgasoft")
 
 # Screenshot
-![Raspberry Pi Monitoring Panel](http://i1.wp.com/geekytheory.com/wp-content/uploads/2013/12/panel-monitorizacion-raspberry-pi-node-js.png "Raspberry Pi Monitoring Panel")
+![CHIP Monitoring Panel](http://i1.wp.com/geekytheory.com/wp-content/uploads/2013/12/panel-monitorizacion-raspberry-pi-node-js.png "CHIP Monitoring Panel")
 
 # How to install
 
-**STEP 1:**
+**Install software:**
 ~~~
-$ sudo apt-get update && sudo apt-get upgrade
-~~~
-**STEP 2:**
-~~~
+$ sudo apt-get update
+$ sudo apt-get upgrade
 $ sudo apt-get install nodejs npm git
+$ git clone https://github.com/helgasoft/CHIP-Status.git
 ~~~
-**STEP 3:**
+**Install web pages/modules:**
 ~~~
-$ git clone https://github.com/GeekyTheory/Raspberry-Pi-Status.git
+$ mkdir /var/www/html/chip	(create your web folder for the application, could be anywhere)
+$ cd CHIP-Status		(your Git folder)
+$ cp index.html server.js package.json /var/www/html/chip	(copy files from Git folder to web folder)
+$ cd /var/www/html/chip
+$ npm install socket.io   	(this will create a subfolder "node_modules")
 ~~~
-**STEP 4:**
-~~~
-$ cd Raspberry-Pi-Status
-~~~
-**STEP 5:**
-~~~
-$ npm install
-~~~
-If everything is OK, go to step 6. If it throws an error:
-~~~
-npm config set registry http://registry.npmjs.org/
-~~~
-~~~
-npm install
-~~~
-**STEP 6:**
+**Run:**
 ~~~
 $ nodejs server.js
 ~~~
-**STEP 7:**
+**Result:**
 
-Open a browser with your Raspberry Pi's IP and start to listen the port 8000. For example: [http://192.168.1.100:8000](http://192.168.1.100:8000)
+Open a browser with your CHIP's IP on port 8000. For example: [http://192.168.1.100:8000](http://192.168.1.100:8000)
 
 
 # License

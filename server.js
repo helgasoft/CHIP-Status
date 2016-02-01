@@ -6,11 +6,13 @@
  */
 var port = 8000;
 var app = require('http').createServer(handler).listen(port, "0.0.0.0"),
-  io = require('/usr/bin/node_modules/socket.io').listen(app),
+  //io = require('/usr/bin/node_modules/socket.io').listen(app),
+  io = require('socket.io').listen(app),  //, { log: false }),
   fs = require('fs'),
   sys = require('util'),
   exec = require('child_process').exec,
   child, child1;
+  io.set('log level', 1);	//reduce log output
   var connectCounter = 0;
 //Escuchamos en el puerto $port
 app.listen(port);
