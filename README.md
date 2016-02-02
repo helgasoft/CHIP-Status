@@ -14,7 +14,7 @@ This project has been developed by [Mario Pérez Esteso](http://github.com/mario
 * [Helgasoft](http://www.helgasoft.com "Helgasoft")
 
 # Screenshot
-![CHIP Monitoring Panel](http://i1.wp.com/geekytheory.com/wp-content/uploads/2013/12/panel-monitorizacion-raspberry-pi-node-js.png "CHIP Monitoring Panel")
+![CHIP Monitoring Panel](https://raw.githubusercontent.com/helgasoft/CHIP-Status/master/chip-status.png "CHIP Monitoring Panel")
 
 # How to install
 
