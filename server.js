@@ -1,19 +1,19 @@
 /**
  * Autor: Mario Pérez Esteso <mario@geekytheory.com>
  * Web: geekytheory.com
- * Updated for CHIP    Jan 2015
- *   TODO:  Up time is delayed by a minute, should show up at once
+ * Adapted for CHIP by Helgasoft   Jan 2015
+ * TODO:  
+ *   Uptime is delayed by a minute, should show up at once
  */
 var port = 8000;
 var app = require('http').createServer(handler).listen(port, "0.0.0.0"),
-  //io = require('/usr/bin/node_modules/socket.io').listen(app),
   io = require('socket.io').listen(app),  //, { log: false }),
   fs = require('fs'),
   sys = require('util'),
   exec = require('child_process').exec,
   child, child1;
-  io.set('log level', 1);	//reduce log output
-  var connectCounter = 0;
+  //io.set('log level', 1);	//reduce log output, replaced with DEBUG=
+var connectCounter = 0;
 //Escuchamos en el puerto $port
 app.listen(port);
 //Si todo va bien al abrir el navegador, cargaremos el archivo index.html
@@ -59,30 +59,13 @@ io.sockets.on('connection', function(socket) {
     }
   });
 
-    child = exec("uptime | tail -n 1 | awk '{print $1}'", function (error, stdout, stderr) {
-    if (error !== null) {
-      console.log('uptime exec error: ' + error);
-    } else {
-      socket.emit('uptime', stdout); 
-    }
-  });
-
     child = exec("uname -r", function (error, stdout, stderr) {
     if (error !== null) {
       console.log('kernel exec error: ' + error);
     } else {
       socket.emit('kernel', stdout); 
     }
-  });
-
-/*    child = exec("top -d 0.5 -b -n2 | tail -n 10 | awk '{print $12}'", function (error, stdout, stderr) {
-	    if (error !== null) {
-	      console.log('toplist exec error: ' + error);
-	    } else {
-	      socket.emit('toplist', stdout); 
-	    }
-	  });
-*/    
+  });  
 
   setInterval(function(){
     // Function for checking memory free and used  "cat /proc/meminfo"
@@ -130,15 +113,14 @@ io.sockets.on('connection', function(socket) {
 
   // Function for measuring temperature
   setInterval(function(){
-    //child = exec("cat /sys/class/thermal/thermal_zone0/temp", function (error, stdout, stderr) {
     child = exec("lsb=$(i2cget -y -f 0 0x34 0x5f); msb=$(i2cget -y -f 0 0x34 0x5e); bin=$(( $(($msb << 4)) | $(($lsb & 0x0F)))); echo $bin", function (error, stdout, stderr) {
     if (error !== null) {
       console.log('temperatureUpdate exec error: ' + error);
     } else {
       //Es necesario mandar el tiempo (eje X) y un valor de temperatura (eje Y).
-      var date = new Date().getTime();
+      var time = new Date().getTime();
       var temp = parseFloat(stdout)/10 - 144.7;	  // in Celsius
-      socket.emit('temperatureUpdate', date, temp); 
+      socket.emit('temperatureUpdate', time, temp); 
     }
   });}, 5000);
 
@@ -148,24 +130,27 @@ io.sockets.on('connection', function(socket) {
       console.log('cpuUsageUpdate exec error: ' + error);
     } else {
       //Es necesario mandar el tiempo (eje X) y un valor de temperatura (eje Y).
-      var date = new Date().getTime();
-      socket.emit('cpuUsageUpdate', date, parseFloat(stdout)); 
+      var time = new Date().getTime();
+      socket.emit('cpuUsageUpdate', time, parseFloat(stdout)); 
     }
   });}, 10000);
 
 	// Uptime
   setInterval(function(){
-    child = exec("uptime | tail -n 1 | awk '{print $3}' |  rev | cut -c 2- | rev", function (error, stdout, stderr) {
+    child = exec("uptime", function (error, stdout, stderr) {  // | awk '{print $3}' |  rev | cut -c 2- | rev
 	    if (error !== null) {
 	      console.log('uptime exec error: ' + error);
 	    } else {
-	      socket.emit('uptime', stdout); 
+	      // uptime returns a string "10:42:27 up 1 day,  2:10,  3 users,  load average: 2.12, 1.44, 1.38"
+	      var juptime = stdout.substring(stdout.lastIndexOf("up")+3, stdout.lastIndexOf("users")); 
+	      juptime = juptime.substr(0, juptime.length-5);
+	      socket.emit('uptime', juptime); 
 	    }
 	  });}, 60000);
 
 // TOP list
   setInterval(function(){
-    child = exec("ps aux --width 30 --sort -rss --no-headers | head  | awk '{print $11}'", function (error, stdout, stderr) {
+    child = exec("ps aux --width 30 --sort -pcpu --no-headers | head  | awk '{print $11}'", function (error, stdout, stderr) {
 	    if (error !== null) {
 	      console.log('toplist exec error: ' + error);
 	    } else {
