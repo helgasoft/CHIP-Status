@@ -1,32 +1,29 @@
 <!--
     Autor: Mario Pérez Esteso <mario@geekytheory.com>
     Web: geekytheory.com
-    Adapted for CHIP by Helgasoft   Jan 2015
+    Adapted for CHIP by Helgasoft   Jan 2016
 -->
 <html class="no-js" lang="en">
 <head>
     <meta charset="utf-8" />
+    <link rel='shortcut icon' type='image/x-icon' href='favicon.ico' />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>
-		CHIP Status
-	</title>
+    <title>CHIP Status</title>
     <!-- Importo el módulo socket.io que tengo en el proyecto -->
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery.js"></script>
     <!-- Importo el archivo Javascript de Highcharts directamente desde su servidor -->
-    <!--<script src="http://code.highcharts.com/highcharts.js" type="application/javascript"></script>-->
     <script src="http://code.highcharts.com/stock/highstock.js"></script>
     <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
 
-<!-- Optional theme -->
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
-
-<!-- Latest compiled and minified JavaScript -->
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
-<script src="http://code.highcharts.com/modules/exporting.js"></script>
-
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
 </head>
+
 <body>
   <div class="container">
           
@@ -34,25 +31,26 @@
       <div class="col-lg-4">
         <div class="panel panel-primary">
           <div class="panel-heading">General Info</div>
-          <div class="panel-body"><p  id="p_hostname">Here is general info for the CHIP</p>
+          <div class="panel-body"><p id="p_hostname">Here is general info for the CHIP</p>
             <p  id="p_kernel"></p>
             <p  id="p_uptime"></p>
             <div>
-                <b>Top list</b> by CPU utilization:
-                <ol id="toplist">
-                </ol>
+                <b>Top list</b> by CPU utilization
+                <ol id="toplist"></ol>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-lg-8"><p />
-        <div id="chartMemory" style="min-width: 100; height:250px; margin: 0 auto"></div>
+      <div class="col-lg-8">
+	<p><center><span><h2><img src=chip-logo.png /> <a href=http://docs.getchip.com>CHIP</a> STATUS</h2></span></center></p>
+	<p>&nbsp;<br />&nbsp;<br />
+		<div id="chartMemory" style="min-width: 100; height:222px; margin: 0 auto"></div></p>
       </div>
   </div>
 
   <div class="row marketing">
       <div class="col-lg-6">
-        <div class="container" id="chart" style="width:100%; height:300px;"></div>
+        <div class="container" id="Tchart" style="width:100%; height:300px;"></div>
       </div>
       <div class="col-lg-6">
         <div class="container" id="cpu_usage" style="width:100%; height:300px;"></div>
@@ -61,7 +59,6 @@
     <!-- Creo el div donde tendré la gráfica. Le digo que ocupe todo el ancho
          de la pantalla y 400px de alto -->
 
-    <!-- Comienza el Javascript -->
     <script>
     // Creo un WebSocket. ¡Poned la IP de vuestra CHIP! 
     var socket = io.connect('http://'+ location.host);
@@ -69,7 +66,7 @@
     var chart, chartCPU, chartMem, memTotal;
     chart = new Highcharts.StockChart({
         chart: {
-            renderTo: 'chart', 
+            renderTo: 'Tchart', 
             defaultSeriesType: 'spline',
             events: {
                 load: function() {
@@ -82,7 +79,7 @@
             }
         },
         title: {
-            text: 'CHIP Temperature of PMU (axp209)'
+            text: 'Temperature of PMU (axp209)'
         },
         xAxis: {
             type: 'datetime',
@@ -121,7 +118,7 @@
             }
         },
         title: {
-            text: 'CPU Load CHIP'
+            text: 'CPU Load'
         },
         xAxis: {
             type: 'datetime',
@@ -191,6 +188,7 @@
             },
             series: [{
                 name: "Memory",
+		showInLegend: false,
                 data: [{y: 0, color: 'red'}, {y: 0, color: 'green'}, {y: 0, color: 'blue'}, {y: 0, color: 'orange'}]
             }]
         });
@@ -220,8 +218,8 @@
             document.getElementById("toplist").innerHTML=result;
         });
         socket.on('memoryTotal', function (mem) {
-          chartMem.setTitle({text:"Memory: "+mem+" KB "});
           memTotal = mem;
+          chartMem.setTitle({text:"Memory: "+memTotal+" KB "});
         });
     </script>   
 </body>

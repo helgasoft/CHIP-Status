@@ -27,15 +27,16 @@ $ git clone https://github.com/helgasoft/CHIP-Status.git
 ~~~
 **Install web pages/modules:**
 ~~~
-$ mkdir /var/www/html/chip	(create your web folder for the application, could be anywhere)
-$ cd CHIP-Status		(your Git folder)
-$ cp index.html server.js package.json README.md /var/www/html/chip	(copy files from Git folder to web folder)
+$ mkdir /var/www/html/chip	# create your web folder for the application, could be anywhere
+$ cd CHIP-Status		# your Git folder
+$ shopt -s extglob		# enable name exclusion
+$ cp !(*git*) /var/www/html/chip/	# copy non-Git files from Git folder to web folder
 $ cd /var/www/html/chip
-$ npm install socket.io   	(will create a subfolder "node_modules")
+$ npm install socket.io   	# will create a subfolder "node_modules"
 ~~~
 **Run:**
 ~~~
-$ DEBUG=-* nodejs server.js	(with debugging disabled)
+$ sudo DEBUG=-* nodejs server.js	# run without debugging
 ~~~
 **Result:**
 

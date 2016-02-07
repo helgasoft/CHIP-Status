@@ -1,12 +1,12 @@
 /**
  * Autor: Mario Pérez Esteso <mario@geekytheory.com>
  * Web: geekytheory.com
- * Adapted for CHIP by Helgasoft   Jan 2015
- * TODO:  
- *   Uptime is delayed by a minute, should show up at once
+ * Adapted for CHIP by Helgasoft   Jan 2016
  */
 var port = 8000;
-var app = require('http').createServer(handler).listen(port, "0.0.0.0"),
+var 
+  app = require('http').createServer(handler).listen(port, "0.0.0.0"),
+  path = require('path'),
   io = require('socket.io').listen(app),  //, { log: false }),
   fs = require('fs'),
   sys = require('util'),
@@ -14,21 +14,84 @@ var app = require('http').createServer(handler).listen(port, "0.0.0.0"),
   child, child1;
   //io.set('log level', 1);	//reduce log output, replaced with DEBUG=
 var connectCounter = 0;
-//Escuchamos en el puerto $port
-app.listen(port);
-//Si todo va bien al abrir el navegador, cargaremos el archivo index.html
+
+//function handler(req, res) {
+//	fs.readFile(__dirname+'/index.html', function(err, data) {
+//		if (err) {
+// 			console.log(err);
+//			res.writeHead(500);
+//			return res.end('Error loading index.html');
+//		}
+//		res.writeHead(200);
+//		res.end(data);
+//	});
+//}
+//a helper function to handle HTTP requests
 function handler(req, res) {
-	fs.readFile(__dirname+'/index.html', function(err, data) {
-		if (err) {
-      //Si hay error, mandaremos un mensaje de error 500
-			console.log(err);
-			res.writeHead(500);
-			return res.end('Error loading index.html');
-		}
-		res.writeHead(200);
-		res.end(data);
+	var
+	fileName = path.basename(req.url) || 'index.html',
+	ext = path.extname(fileName),
+	localFolder = __dirname + '/',
+	//localFolder = __dirname + '/public/',
+	page404 = localFolder + '404.html';
+ 
+	//do we support the requested file type?
+	if(!extensions[ext]){
+		//for now just send a 404 and a short message
+		res.writeHead(404, {'Content-Type': 'text/html'});
+		res.end("&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;The requested file type is not supported&lt;/body&gt;&lt;/html&gt;");
+	};
+ 
+	//call our helper function
+	//pass in the path to the file we want,
+	//the response object, and the 404 page path
+	//in case the requestd file is not found
+	getFile((localFolder + fileName), res, page404, extensions[ext]);
+};
+//these are the only file types we will support
+extensions = {
+	".html": "text/html",
+	".css" : "text/css",
+	".js"  : "application/javascript",
+	".png" : "image/png",
+	".gif" : "image/gif",
+	".jpg" : "image/jpeg",
+	".ico" : "image/x-icon"
+};
+ 
+//helper function handles file verification
+function getFile(filePath, res, page404, mimeType){
+	//does the requested file exist?
+	fs.exists(filePath, function(exists){
+		if(exists){
+			//read the fiule, run the anonymous function
+			fs.readFile(filePath, function(err,contents){
+				if(!err){
+					//send the contents with the default 200/ok header
+					res.writeHead(200,{
+						"Content-type" : mimeType,
+						"Content-Length" : contents.length
+					});
+					res.end(contents);
+				} else
+					console.dir(err);  //for our own troubleshooting
+			});
+		} else {
+			//if the requested file was not found serve-up our custom 404 page
+			fs.readFile(page404, function(err,contents){
+				if(!err){
+					//send the contents with a 404/not found header 
+					res.writeHead(404, {'Content-Type': 'text/html'});
+					res.end(contents);
+				} else
+					console.dir(err);  //for our own troubleshooting
+			});
+		};
 	});
-}
+};
+ 
+// listen for an HTTP request on port 3000
+app.listen(port);
 
 //Cuando abramos el navegador estableceremos una conexión con socket.io.
 //Cada X segundos mandaremos a la gráfica un nuevo valor. 
@@ -125,7 +188,7 @@ io.sockets.on('connection', function(socket) {
   });}, 5000);
 
   setInterval(function(){
-    child = exec("top -d 0.5 -b -n2 | grep 'Cpu(s)'|tail -n 1 | awk '{print $2 + $4}'", function (error, stdout, stderr) {
+    child = exec("top -d 0.5 -b -n2 | grep 'Cpu(s)' | tail -n 1 | awk '{print $2 + $4}'", function (error, stdout, stderr) {
     if (error !== null) {
       console.log('cpuUsageUpdate exec error: ' + error);
     } else {
@@ -150,7 +213,7 @@ io.sockets.on('connection', function(socket) {
 
 // TOP list
   setInterval(function(){
-    child = exec("ps aux --width 30 --sort -pcpu --no-headers | head  | awk '{print $11}'", function (error, stdout, stderr) {
+    child = exec("ps -Ao comm,pcpu --sort=-pcpu --no-headers | head -n 10 | awk '{print $1 \" - \" $2\"%\"}'", function (error, stdout, stderr) {	//ps aux --width 30'
 	    if (error !== null) {
 	      console.log('toplist exec error: ' + error);
 	    } else {
