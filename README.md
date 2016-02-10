@@ -42,15 +42,15 @@ sudo DEBUG=-* nodejs server.js	# run without debugging
 
 Open a browser with your CHIP's IP on port 8000. For example: [http://192.168.1.100:8000](http://192.168.1.100:8000)
 
-~~~
 **Run as a service (optional)**
+
 ~~~
 sudo adduser chip i2c		# take care of permissions
 nano /var/www/html/chip/ChipStatusApp.service	# edit ExecStart & WorkingDirectory with your path
 mv /var/www/html/chip/ChipStatusApp.service /etc/systemd/system/	# move to services folder
 systemctl daemon-reload		
 systemctl start ChipStatusApp
-systemctl status ChipStatusApp.service	# to confirm service is running
+systemctl status ChipStatusApp.service          # confirm service is running
 ~~~
 
 # License
