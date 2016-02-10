@@ -18,29 +18,38 @@ This project has been developed by [Mario Pérez Esteso](http://github.com/mario
 
 # How to install
 
-**Install software:**
+**Install software**
 ~~~
-$ sudo apt-get update
-$ sudo apt-get upgrade
-$ sudo apt-get install nodejs npm git
-$ git clone https://github.com/helgasoft/CHIP-Status.git
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install nodejs npm git
+git clone https://github.com/helgasoft/CHIP-Status.git
 ~~~
-**Install web pages/modules:**
+**Install web pages/modules**
 ~~~
-$ mkdir /var/www/html/chip	# create your web folder for the application, could be anywhere
-$ cd CHIP-Status		# your Git folder
-$ shopt -s extglob		# enable name exclusion
-$ cp !(*git*) /var/www/html/chip/	# copy non-Git files from Git folder to web folder
-$ cd /var/www/html/chip
-$ npm install socket.io   	# will create a subfolder "node_modules"
+mkdir /var/www/html/chip	# create your web folder for the application, could be anywhere
+cd CHIP-Status			# your Git folder
+shopt -s extglob		# enable name exclusion
+cp !(*git*) /var/www/html/chip/	# copy non-Git files from Git folder to web folder
+cd /var/www/html/chip
+npm install socket.io   	# will create a subfolder "node_modules"
 ~~~
-**Run:**
+**Run**
 ~~~
-$ sudo DEBUG=-* nodejs server.js	# run without debugging
+sudo DEBUG=-* nodejs server.js	# run without debugging
 ~~~
 **Result:**
 
 Open a browser with your CHIP's IP on port 8000. For example: [http://192.168.1.100:8000](http://192.168.1.100:8000)
+~~~
+**Run as a service (optional)**
+~~~
+sudo adduser chip i2c		# take care of permissions
+nano /var/www/html/chip/ChipStatusApp.service		# edit ExecStart and WorkingDirectory with your path
+mv /var/www/html/chip/ChipStatusApp.service /etc/systemd/system/		# move to services folder
+systemctl daemon-reload		
+systemctl start ChipStatusApp
+systemctl status ChipStatusApp.service	# to confirm service is running
 
 
 # License

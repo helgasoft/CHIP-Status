@@ -1,0 +1,18 @@
+[Unit]
+Description=Chip Status 
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/nodejs /var/www/html/chip/server.js
+Restart=always
+RestartSec=2
+StandardOutput=syslog
+SyslogIdentifier=server
+Environment=PATH=/usr/bin:/usr/local/bin:/usr/sbin:/bin
+WorkingDirectory=/var/www/html/chip
+# do this first: sudo adduser chip i2c
+User=chip
+Group=chip
+
+[Install]
+WantedBy=multi-user.target
