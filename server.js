@@ -39,7 +39,7 @@ function handler(req, res) {
 	if(!extensions[ext]){
 		//for now just send a 404 and a short message
 		res.writeHead(404, {'Content-Type': 'text/html'});
-		res.end("&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;The requested file type is not supported&lt;/body&gt;&lt;/html&gt;");
+		res.end("<html><head></head><body>The requested file type is not supported</body></html>");
 	};
  
 	//call our helper function
@@ -173,6 +173,60 @@ io.sockets.on('connection', function(socket) {
       sendData = 1;
     }
   }, 5000);
+
+  // Function for measuring ACIN voltage in Volts
+  setInterval(function(){
+    child = exec("lsb=$(i2cget -y -f 0 0x34 0x57); msb=$(i2cget -y -f 0 0x34 0x56); bin=$(( $(($msb << 4)) | $(($lsb & 0x0F)))); echo $bin", function (error, stdout, stderr) {
+    if (error !== null) {
+      console.log('ACINvoltageUpdate exec error: ' + error);
+    } else {
+      //Es necesario mandar el tiempo (eje X) y un valor de voltage (eje Y).
+      var time = new Date().getTime();
+      var current = parseFloat(stdout)*1.7;	  // in volts
+      socket.emit('ACINvoltageUpdate', time, current); 
+    }
+  });}, 5000);
+
+  // Function for measuring ACIN current in mA
+  setInterval(function(){
+    child = exec("lsb=$(i2cget -y -f 0 0x34 0x59); msb=$(i2cget -y -f 0 0x34 0x58); bin=$(( $(($msb << 4)) | $(($lsb & 0x0F)))); echo $bin", function (error, stdout, stderr) {
+    if (error !== null) {
+      console.log('ACINcurrentUpdate exec error: ' + error);
+    } else {
+      //Es necesario mandar el tiempo (eje X) y un valor de current (eje Y).
+      var time = new Date().getTime();
+      var current = parseFloat(stdout)*0.375;	  // in milliAmps
+      socket.emit('ACINcurrentUpdate', time, current); 
+    }
+  });}, 5000);
+
+  // Function for measuring temperature
+
+  // Function for measuring VBUS voltage in Volts
+  setInterval(function(){
+    child = exec("lsb=$(i2cget -y -f 0 0x34 0x5b); msb=$(i2cget -y -f 0 0x34 0x5a); bin=$(( $(($msb << 4)) | $(($lsb & 0x0F)))); echo $bin", function (error, stdout, stderr) {
+    if (error !== null) {
+      console.log('VBUSvoltageUpdate exec error: ' + error);
+    } else {
+      //Es necesario mandar el tiempo (eje X) y un valor de voltage (eje Y).
+      var time = new Date().getTime();
+      var current = parseFloat(stdout)*1.7;	  // in volts
+      socket.emit('VBUSvoltageUpdate', time, current); 
+    }
+  });}, 5000);
+
+  // Function for measuring VBUS current in mA
+  setInterval(function(){
+    child = exec("lsb=$(i2cget -y -f 0 0x34 0x5d); msb=$(i2cget -y -f 0 0x34 0x5c); bin=$(( $(($msb << 4)) | $(($lsb & 0x0F)))); echo $bin", function (error, stdout, stderr) {
+    if (error !== null) {
+      console.log('VBUScurrentUpdate exec error: ' + error);
+    } else {
+      //Es necesario mandar el tiempo (eje X) y un valor de current (eje Y).
+      var time = new Date().getTime();
+      var current = parseFloat(stdout)*0.375;	  // in milliAmps
+      socket.emit('VBUScurrentUpdate', time, current); 
+    }
+  });}, 5000);
 
   // Function for measuring temperature
   setInterval(function(){

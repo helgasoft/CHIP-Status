@@ -50,6 +50,18 @@
 
   <div class="row marketing">
       <div class="col-lg-6">
+        <div class="container" id="ACINvoltageChart" style="width:100%; height:300px;"></div>
+      </div>
+      <div class="col-lg-6">
+        <div class="container" id="ACINcurrentChart" style="width:100%; height:300px;"></div>
+      </div>
+      <div class="col-lg-6">
+        <div class="container" id="VBUSvoltageChart" style="width:100%; height:300px;"></div>
+      </div>
+      <div class="col-lg-6">
+        <div class="container" id="VBUScurrentChart" style="width:100%; height:300px;"></div>
+      </div>
+      <div class="col-lg-6">
         <div class="container" id="Tchart" style="width:100%; height:300px;"></div>
       </div>
       <div class="col-lg-6">
@@ -63,7 +75,165 @@
     // Creo un WebSocket. ¡Poned la IP de vuestra CHIP! 
     var socket = io.connect('http://'+ location.host);
     // console.log(location.host)
-    var chart, chartCPU, chartMem, memTotal;
+    var chart, chartCPU, chartMem, memTotal, chartVBUScurrent, 
+        chartVBUSvoltage, chartACINcurrent, chartACINvoltage;
+
+    chartACINvoltage = new Highcharts.StockChart({
+        chart: {
+            renderTo: 'ACINvoltageChart', 
+            defaultSeriesType: 'spline',
+            events: {
+                load: function() {
+                    // Cada vez que reciba un valor desde el socket, lo meto en la gráfica
+                    socket.on('ACINvoltageUpdate', function (time, data) {
+                        var series = chartACINvoltage.series[0];
+                        series.addPoint([time, data]);
+                    });
+                }
+            }
+        },
+        title: {
+            text: 'ACIN voltage (axp209)'
+        },
+        xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 150,
+            maxZoom: 20 * 1000
+        },
+        yAxis: {
+            minPadding: 0.2,
+            maxPadding: 0.2,
+            title: {
+                text: 'volts',
+                margin: 10
+            }
+        },
+        series: [{
+            name: 'ACINvoltage',
+            data: []
+        }],
+        credits: {
+            enabled: false
+        }
+    });
+
+    chartACINcurrent = new Highcharts.StockChart({
+        chart: {
+            renderTo: 'ACINcurrentChart', 
+            defaultSeriesType: 'spline',
+            events: {
+                load: function() {
+                    // Cada vez que reciba un valor desde el socket, lo meto en la gráfica
+                    socket.on('ACINcurrentUpdate', function (time, data) {
+                        var series = chartACINcurrent.series[0];
+                        series.addPoint([time, data]);
+                    });
+                }
+            }
+        },
+        title: {
+            text: 'ACIN current (axp209)'
+        },
+        xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 150,
+            maxZoom: 20 * 1000
+        },
+        yAxis: {
+            minPadding: 0.2,
+            maxPadding: 0.2,
+            title: {
+                text: 'milliAmps',
+                margin: 10
+            }
+        },
+        series: [{
+            name: 'ACINcurrent',
+            data: []
+        }],
+        credits: {
+            enabled: false
+        }
+    });
+
+    chartVBUSvoltage = new Highcharts.StockChart({
+        chart: {
+            renderTo: 'VBUSvoltageChart', 
+            defaultSeriesType: 'spline',
+            events: {
+                load: function() {
+                    // Cada vez que reciba un valor desde el socket, lo meto en la gráfica
+                    socket.on('VBUSvoltageUpdate', function (time, data) {
+                        var series = chartVBUSvoltage.series[0];
+                        series.addPoint([time, data]);
+                    });
+                }
+            }
+        },
+        title: {
+            text: 'VBUS voltage (axp209)'
+        },
+        xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 150,
+            maxZoom: 20 * 1000
+        },
+        yAxis: {
+            minPadding: 0.2,
+            maxPadding: 0.2,
+            title: {
+                text: 'volts',
+                margin: 10
+            }
+        },
+        series: [{
+            name: 'VBUSvoltage',
+            data: []
+        }],
+        credits: {
+            enabled: false
+        }
+    });
+
+    chartVBUScurrent = new Highcharts.StockChart({
+        chart: {
+            renderTo: 'VBUScurrentChart', 
+            defaultSeriesType: 'spline',
+            events: {
+                load: function() {
+                    // Cada vez que reciba un valor desde el socket, lo meto en la gráfica
+                    socket.on('VBUScurrentUpdate', function (time, data) {
+                        var series = chartVBUScurrent.series[0];
+                        series.addPoint([time, data]);
+                    });
+                }
+            }
+        },
+        title: {
+            text: 'VBUS current (axp209)'
+        },
+        xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 150,
+            maxZoom: 20 * 1000
+        },
+        yAxis: {
+            minPadding: 0.2,
+            maxPadding: 0.2,
+            title: {
+                text: 'milliAmps',
+                margin: 10
+            }
+        },
+        series: [{
+            name: 'VBUScurrent',
+            data: []
+        }],
+        credits: {
+            enabled: false
+        }
+    });
+
     chart = new Highcharts.StockChart({
         chart: {
             renderTo: 'Tchart', 
@@ -103,7 +273,7 @@
         }
     });
 
-      chartCPU = new Highcharts.StockChart({
+    chartCPU = new Highcharts.StockChart({
         chart: {
             renderTo: 'cpu_usage', 
             defaultSeriesType: 'spline',

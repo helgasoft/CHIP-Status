@@ -3,13 +3,13 @@ Description=Chip Status
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/nodejs /var/www/html/chip/server.js
+ExecStart=/usr/bin/nodejs /var/www/chipstatus/server.js
 Restart=always
 RestartSec=2
 StandardOutput=syslog
-SyslogIdentifier=server
+SyslogIdentifier=ChipStatus
 Environment=PATH=/usr/bin:/usr/local/bin:/usr/sbin:/bin
-WorkingDirectory=/var/www/html/chip
+WorkingDirectory=/var/www/chipstatus
 # do this first: sudo adduser chip i2c
 User=chip
 Group=chip
