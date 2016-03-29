@@ -48,6 +48,7 @@ function handler(req, res) {
 	//in case the requestd file is not found
 	getFile((localFolder + fileName), res, page404, extensions[ext]);
 };
+
 //these are the only file types we will support
 extensions = {
 	".html": "text/html",
@@ -108,28 +109,59 @@ io.sockets.on('connection', function(socket) {
   // Function for measuring ACIN voltage in Volts
   var getACINvoltage = function(){
     child = exec("lsb=$(i2cget -y -f 0 0x34 0x57); msb=$(i2cget -y -f 0 0x34 0x56); bin=$(( $(($msb << 4)) | $(($lsb & 0x0F)))); echo $bin", function (error, stdout, stderr) {
-    if (error !== null) {
-      console.log('ACINvoltageUpdate exec error: ' + error);
-    } else {
-      //Es necesario mandar el tiempo (eje X) y un valor de voltage (eje Y).
-      var time = new Date().getTime();
-      var current = parseFloat(stdout)*1.7;	  // in volts
-      socket.emit('ACINvoltageUpdate', time, current);
-    }
-  });}
+      if (error !== null) {
+        console.log('ACINvoltageUpdate exec error: ' + error);
+      } else {
+        //Es necesario mandar el tiempo (eje X) y un valor de voltage (eje Y).
+        var time = new Date().getTime();
+        var current = parseFloat(stdout)*1.7;	  // in volts
+        socket.emit('ACINvoltageUpdate', time, current);
+      }
+    });
+  }
 
   // Function for measuring ACIN current in mA
   var getACINcurrent = function(){
     child = exec("lsb=$(i2cget -y -f 0 0x34 0x59); msb=$(i2cget -y -f 0 0x34 0x58); bin=$(( $(($msb << 4)) | $(($lsb & 0x0F)))); echo $bin", function (error, stdout, stderr) {
-    if (error !== null) {
-      console.log('ACINcurrentUpdate exec error: ' + error);
-    } else {
-      //Es necesario mandar el tiempo (eje X) y un valor de current (eje Y).
-      var time = new Date().getTime();
-      var current = parseFloat(stdout)*0.375;	  // in milliAmps
-      socket.emit('ACINcurrentUpdate', time, current);
-    }
-  });}
+      if (error !== null) {
+        console.log('ACINcurrentUpdate exec error: ' + error);
+      } else {
+        //Es necesario mandar el tiempo (eje X) y un valor de current (eje Y).
+        var time = new Date().getTime();
+        var current = parseFloat(stdout)*0.375;	  // in milliAmps
+        socket.emit('ACINcurrentUpdate', time, current);
+      }
+    });
+  }
+
+  // Function for measuring VBUS voltage in Volts
+  var getVBUSvoltage = function(){
+    child = exec("lsb=$(i2cget -y -f 0 0x34 0x5b); msb=$(i2cget -y -f 0 0x34 0x5a); bin=$(( $(($msb << 4)) | $(($lsb & 0x0F)))); echo $bin", function (error, stdout, stderr) {
+      if (error !== null) {
+        console.log('VBUSvoltageUpdate exec error: ' + error);
+      } else {
+        //Es necesario mandar el tiempo (eje X) y un valor de voltage (eje Y).
+        var time = new Date().getTime();
+        var current = parseFloat(stdout)*1.7;	  // in volts
+        socket.emit('VBUSvoltageUpdate', time, current);
+      }
+    });
+  }
+
+  // Function for measuring VBUS current in mA
+  var getVBUScurrent = function(){
+    child = exec("lsb=$(i2cget -y -f 0 0x34 0x5d); msb=$(i2cget -y -f 0 0x34 0x5c); bin=$(( $(($msb << 4)) | $(($lsb & 0x0F)))); echo $bin", function (error, stdout, stderr) {
+      if (error !== null) {
+        console.log('VBUScurrentUpdate exec error: ' + error);
+      } else {
+        //Es necesario mandar el tiempo (eje X) y un valor de current (eje Y).
+        var time = new Date().getTime();
+        var current = parseFloat(stdout)*0.375;	  // in milliAmps
+        socket.emit('VBUScurrentUpdate', time, current);
+      }
+    });
+  }
+
 
   // Function for checking memory
   child = exec("egrep 'MemTotal' /proc/meminfo | egrep '[0-9.]{4,}' -o", function (error, stdout, stderr) {
@@ -203,44 +235,34 @@ io.sockets.on('connection', function(socket) {
 
   // Emit ACIN voltage and current if ACIN exists
   setInterval(function(){
+    // AXP209 register 0x00 Power status input - bit 7: 1 (0x80) - ACIN present
     child = exec("echo $(($(i2cget -y -f 0 0x34 0x00) & 0x80 ))", function (error, stdout, stderr) {
       if (error !== null) {
         console.log('"echo $(($(i2cget -y -f 0 0x34 0x00) & 0x80 ))" exec error: ' + error);
       } else {
+        // trim off any trailing CR/LF
         if (stdout.trim() != "0") {
           getACINvoltage();
           getACINcurrent();
-          console.log( 'ACIN stdout = ' + stdout );
         } else
-          console.log( 'ACIN voltage not present' );
+          console.log( 'ACIN is not present' );
       }
     });
   }, 5000);
 
-  // Function for measuring VBUS voltage in Volts
+  // Emit VBUS voltage and current if VBUS present
   setInterval(function(){
-    child = exec("lsb=$(i2cget -y -f 0 0x34 0x5b); msb=$(i2cget -y -f 0 0x34 0x5a); bin=$(( $(($msb << 4)) | $(($lsb & 0x0F)))); echo $bin", function (error, stdout, stderr) {
+    // AXP209 register 0x00 Power status input - bit 5: 1 (0x20) - VBUS exists
+    child = exec("echo $(($(i2cget -y -f 0 0x34 0x00) & 0x20 ))", function (error, stdout, stderr) {
       if (error !== null) {
-        console.log('VBUSvoltageUpdate exec error: ' + error);
+        console.log('"echo $(($(i2cget -y -f 0 0x34 0x00) & 0x20 ))" exec error: ' + error);
       } else {
-        //Es necesario mandar el tiempo (eje X) y un valor de voltage (eje Y).
-        var time = new Date().getTime();
-        var current = parseFloat(stdout)*1.7;	  // in volts
-        socket.emit('VBUSvoltageUpdate', time, current);
-      }
-    });
-  }, 5000);
-
-  // Function for measuring VBUS current in mA
-  setInterval(function(){
-    child = exec("lsb=$(i2cget -y -f 0 0x34 0x5d); msb=$(i2cget -y -f 0 0x34 0x5c); bin=$(( $(($msb << 4)) | $(($lsb & 0x0F)))); echo $bin", function (error, stdout, stderr) {
-      if (error !== null) {
-        console.log('VBUScurrentUpdate exec error: ' + error);
-      } else {
-        //Es necesario mandar el tiempo (eje X) y un valor de current (eje Y).
-        var time = new Date().getTime();
-        var current = parseFloat(stdout)*0.375;	  // in milliAmps
-        socket.emit('VBUScurrentUpdate', time, current);
+        // trim off any trailing CR/LF
+        if (stdout.trim() != "0") {
+          getVBUSvoltage();
+          getVBUScurrent();
+        } else
+          console.log( 'VBUS is not present' );
       }
     });
   }, 5000);
