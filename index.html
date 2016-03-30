@@ -26,7 +26,7 @@
 
 <body>
   <div class="container">
-          
+
   <div class="row marketing">
       <div class="col-lg-4">
         <div class="panel panel-primary">
@@ -72,15 +72,15 @@
          de la pantalla y 400px de alto -->
 
     <script>
-    // Creo un WebSocket. ¡Poned la IP de vuestra CHIP! 
+    // Creo un WebSocket. ¡Poned la IP de vuestra CHIP!
     var socket = io.connect('http://'+ location.host);
     // console.log(location.host)
-    var chart, chartCPU, chartMem, memTotal, chartVBUScurrent, 
+    var chart, chartCPU, chartMem, memTotal, chartVBUScurrent,
         chartVBUSvoltage, chartACINcurrent, chartACINvoltage;
 
     chartACINvoltage = new Highcharts.StockChart({
         chart: {
-            renderTo: 'ACINvoltageChart', 
+            renderTo: 'ACINvoltageChart',
             defaultSeriesType: 'spline',
             events: {
                 load: function() {
@@ -88,6 +88,9 @@
                     socket.on('ACINvoltageUpdate', function (time, data) {
                         var series = chartACINvoltage.series[0];
                         series.addPoint([time, data]);
+                    });
+                    socket.on('ACIN', function (status) {
+                        chartACINvoltage.setTitle(null, { text: status });
                     });
                 }
             }
@@ -119,7 +122,7 @@
 
     chartACINcurrent = new Highcharts.StockChart({
         chart: {
-            renderTo: 'ACINcurrentChart', 
+            renderTo: 'ACINcurrentChart',
             defaultSeriesType: 'spline',
             events: {
                 load: function() {
@@ -127,6 +130,9 @@
                     socket.on('ACINcurrentUpdate', function (time, data) {
                         var series = chartACINcurrent.series[0];
                         series.addPoint([time, data]);
+                    });
+                    socket.on('ACIN', function (status) {
+                        chartACINcurrent.setTitle(null, { text: status });
                     });
                 }
             }
@@ -158,7 +164,7 @@
 
     chartVBUSvoltage = new Highcharts.StockChart({
         chart: {
-            renderTo: 'VBUSvoltageChart', 
+            renderTo: 'VBUSvoltageChart',
             defaultSeriesType: 'spline',
             events: {
                 load: function() {
@@ -166,6 +172,9 @@
                     socket.on('VBUSvoltageUpdate', function (time, data) {
                         var series = chartVBUSvoltage.series[0];
                         series.addPoint([time, data]);
+                    });
+                    socket.on('VBUS', function (status) {
+                        chartVBUSvoltage.setTitle(null, { text: status });
                     });
                 }
             }
@@ -197,7 +206,7 @@
 
     chartVBUScurrent = new Highcharts.StockChart({
         chart: {
-            renderTo: 'VBUScurrentChart', 
+            renderTo: 'VBUScurrentChart',
             defaultSeriesType: 'spline',
             events: {
                 load: function() {
@@ -205,6 +214,9 @@
                     socket.on('VBUScurrentUpdate', function (time, data) {
                         var series = chartVBUScurrent.series[0];
                         series.addPoint([time, data]);
+                    });
+                    socket.on('VBUS', function (status) {
+                        chartVBUScurrent.setTitle(null, { text: status });
                     });
                 }
             }
@@ -236,7 +248,7 @@
 
     chart = new Highcharts.StockChart({
         chart: {
-            renderTo: 'Tchart', 
+            renderTo: 'Tchart',
             defaultSeriesType: 'spline',
             events: {
                 load: function() {
@@ -275,7 +287,7 @@
 
     chartCPU = new Highcharts.StockChart({
         chart: {
-            renderTo: 'cpu_usage', 
+            renderTo: 'cpu_usage',
             defaultSeriesType: 'spline',
             events: {
                 load: function() {
@@ -352,7 +364,7 @@
                         enabled: true
                     }
                 }
-            },            
+            },
             credits: {
                 enabled: false
             },
@@ -373,10 +385,10 @@
         });
         socket.on('kernel', function (ker) {
           document.getElementById("p_kernel").innerHTML="<b>Kernel:</b> " + ker;
-        }); 
+        });
         socket.on('uptime', function (uptime) {
           document.getElementById("p_uptime").innerHTML="<b>Up time</b> (hh:mm): " + uptime;
-        }); 
+        });
         socket.on('toplist', function (toplist) {
             var res = toplist.split("\n");
             var result = "";
@@ -391,6 +403,6 @@
           memTotal = mem;
           chartMem.setTitle({text:"Memory: "+memTotal+" KB "});
         });
-    </script>   
+    </script>
 </body>
 </html>

@@ -114,7 +114,7 @@ io.sockets.on('connection', function(socket) {
       } else {
         //Es necesario mandar el tiempo (eje X) y un valor de voltage (eje Y).
         var time = new Date().getTime();
-        var current = parseFloat(stdout)*1.7;	  // in volts
+        var current = parseFloat(stdout)*0.0017;	  // in volts
         socket.emit('ACINvoltageUpdate', time, current);
       }
     });
@@ -142,7 +142,7 @@ io.sockets.on('connection', function(socket) {
       } else {
         //Es necesario mandar el tiempo (eje X) y un valor de voltage (eje Y).
         var time = new Date().getTime();
-        var current = parseFloat(stdout)*1.7;	  // in volts
+        var current = parseFloat(stdout)*0.0017;	  // in volts
         socket.emit('VBUSvoltageUpdate', time, current);
       }
     });
@@ -244,8 +244,9 @@ io.sockets.on('connection', function(socket) {
         if (stdout.trim() != "0") {
           getACINvoltage();
           getACINcurrent();
+          socket.emit('ACIN', 'Present');
         } else
-          console.log( 'ACIN is not present' );
+          socket.emit('ACIN', 'Not present');
       }
     });
   }, 5000);
@@ -261,8 +262,9 @@ io.sockets.on('connection', function(socket) {
         if (stdout.trim() != "0") {
           getVBUSvoltage();
           getVBUScurrent();
+          socket.emit('VBUS', 'Present');
         } else
-          console.log( 'VBUS is not present' );
+          socket.emit('VBUS', 'Not present');
       }
     });
   }, 5000);
